@@ -14,13 +14,14 @@ import (
 	"strconv"
 )
 
+// KafkaSink the sink object of kafka
 type KafkaSink struct {
 	producer *kafka.Writer
 	idGen    *snowflake.Node
 	recorder KSinkRecorder
 }
 
-func (self *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
+func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 	now := time.Now()
 
 	payload := blp.ParsePayload(e)
@@ -29,16 +30,16 @@ func (self *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 		return nil, err
 	}
 
-	var id string = self.idGen.Generate().String()
+	var id string = ksink.idGen.Generate().String()
 
-	if self.recorder != nil {
-		err = self.recorder.Create(id, payloadBytes)
+	if ksink.recorder != nil {
+		err = ksink.recorder.Create(id, payloadBytes)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	id = self.idGen.Generate().String()
+	id = ksink.idGen.Generate().String()
 
 	headers := []kafka.Header{
 		{"XMEventClass", []byte("com.xiaomai.event.DBSyncEvent")},
@@ -56,21 +57,21 @@ func (self *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 	return logs, nil
 }
 
-func (self *KafkaSink) Publish(reqs []interface{}) error {
+func (ksink *KafkaSink) Publish(reqs []interface{}) error {
 
 	var logs []kafka.Message
 	for _, req := range reqs {
 		logs = append(logs, *req.(*kafka.Message))
 	}
 
-	err := self.producer.WriteMessages(context.Background(), logs...)
+	err := ksink.producer.WriteMessages(context.Background(), logs...)
 	if err != nil {
 		return errors.Trace(err)
 	}
 	return nil
 }
 
-func NewKafkaSink(conf *KafkaConfig, recorder KSinkRecorder) (*KafkaSink, error) {
+func NewKafkaSink(conf *KSinkConfig, recorder KSinkRecorder) (*KafkaSink, error) {
 	p := kafka.NewWriter(
 		kafka.WriterConfig{
 			Brokers: strings.Split(conf.KafkaHosts, ","),
