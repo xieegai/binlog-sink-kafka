@@ -3,7 +3,7 @@ module github.com/bailaohe/binlog-sink-kafka
 go 1.12
 
 require (
-	github.com/bailaohe/binlog-payload v0.0.0-20190917052503-cc3d0f79e266
+	github.com/bailaohe/binlog-payload v0.0.0-20190917053013-b1fd08b2ee4f
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/juju/errors v0.0.0-20190806202954-0232dcc7464d
 	github.com/segmentio/kafka-go v0.3.3
