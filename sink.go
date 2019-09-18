@@ -19,6 +19,7 @@ type KafkaSink struct {
 	producer *kafka.Writer
 	idGen    *snowflake.Node
 	recorder KSinkRecorder
+	config *KSinkConfig
 }
 
 func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
@@ -42,7 +43,7 @@ func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 	id = ksink.idGen.Generate().String()
 
 	headers := []kafka.Header{
-		{"XMEventClass", []byte("com.xiaomai.event.DBSyncEvent")},
+		{"XMEventClass", []byte(ksink.config.PayloadClass)},
 		{"XMEventTriggerTime", []byte(strconv.FormatInt(now.Unix(), 10))},
 		{"XMEventId", []byte(id)},
 	}
@@ -85,5 +86,6 @@ func NewKafkaSink(conf *KSinkConfig, recorder KSinkRecorder) (*KafkaSink, error)
 		producer: p,
 		idGen:    node,
 		recorder: recorder,
+		config: conf,
 	}, nil
 }

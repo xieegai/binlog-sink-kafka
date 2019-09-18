@@ -7,6 +7,9 @@ type KSinkConfig struct {
 	// the kafka topic to hold the rows change
 	KafkaTopic string
 
+	// the payload class path used by java consumer
+	PayloadClass string
+
 	// the service id to facilitate the snowflake id generation
 	ServiceId  int64
 }
