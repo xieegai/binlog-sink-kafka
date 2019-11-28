@@ -65,10 +65,12 @@ func (ksink *KafkaSink) Publish(reqs []interface{}) error {
 		logs = append(logs, *req.(*kafka.Message))
 	}
 
-	err := ksink.producer.WriteMessages(context.Background(), logs...)
-	if err != nil {
-		return errors.Trace(err)
-	}
+	for _, log := range logs {
+		err := ksink.producer.WriteMessages(context.Background(), log)
+		if err != nil {
+			return errors.Trace(err)
+		}
+	}}
 	return nil
 }
 
