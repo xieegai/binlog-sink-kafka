@@ -6,12 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/segmentio/kafka-go"
-	"github.com/bailaohe/binlog-payload"
+	"strconv"
+
+	blp "github.com/bailaohe/binlog-payload"
 	"github.com/bwmarrin/snowflake"
 	"github.com/juju/errors"
+	"github.com/segmentio/kafka-go"
 	"github.com/siddontang/go-mysql/canal"
-	"strconv"
 )
 
 // KafkaSink the sink object of kafka
@@ -19,7 +20,7 @@ type KafkaSink struct {
 	producer *kafka.Writer
 	idGen    *snowflake.Node
 	recorder KSinkRecorder
-	config *KSinkConfig
+	config   *KSinkConfig
 }
 
 func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
@@ -50,8 +51,8 @@ func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 
 	logs := []interface{}{
 		&kafka.Message{
-			Key:   []byte(id),
-			Value: payloadBytes,
+			Key:     []byte(id),
+			Value:   payloadBytes,
 			Headers: headers,
 		},
 	}
@@ -70,7 +71,7 @@ func (ksink *KafkaSink) Publish(reqs []interface{}) error {
 		if err != nil {
 			return errors.Trace(err)
 		}
-	}}
+	}
 	return nil
 }
 
@@ -88,6 +89,6 @@ func NewKafkaSink(conf *KSinkConfig, recorder KSinkRecorder) (*KafkaSink, error)
 		producer: p,
 		idGen:    node,
 		recorder: recorder,
-		config: conf,
+		config:   conf,
 	}, nil
 }
