@@ -1,4 +1,4 @@
-module github.com/bailaohe/binlog-sink-kafka
+module github.com/vperson/binlog-sink-kafka
 
 go 1.12
 
