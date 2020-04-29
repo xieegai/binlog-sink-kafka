@@ -31,6 +31,7 @@ func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 
 	var id = ksink.idGen.Generate().String()
 	var hdrs []sarama.RecordHeader
+	var topic = ksink.config.KafkaTopic
 
 	hdrs = []sarama.RecordHeader{
 		{
@@ -46,10 +47,18 @@ func (ksink *KafkaSink) Parse(e *canal.RowsEvent) ([]interface{}, error) {
 			Value: []byte(id),
 		},
 	}
+	if len(ksink.config.TableMapTopic) > 0 {
+		for _, m := range ksink.config.TableMapTopic {
+			if m.SourceTable == e.Table.Name && m.Topic != "" {
+				topic = m.Topic
+				break
+			}
+		}
+	}
 
 	var message *sarama.ProducerMessage
 	message = &sarama.ProducerMessage{
-		Topic:   ksink.config.KafkaTopic,
+		Topic:   topic,
 		Headers: hdrs,
 	}
 	message.Value = sarama.StringEncoder(string(payloadByte))

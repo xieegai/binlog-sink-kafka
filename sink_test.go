@@ -13,6 +13,7 @@ type RecorderTest struct {
 }
 
 func (r *RecorderTest) Create(id string, payload []byte) error {
+	_, _ = id, payload
 	return nil
 }
 
@@ -25,6 +26,12 @@ func TestKafkaSink_Publish(t *testing.T) {
 		ServiceId:    130,
 		Version:      "2.1.0",
 		RequiredAcks: 2,
+		TableMapTopic: []TableMapTopic{
+			{
+				Topic:       "student_sign_in_fonzie_copy",
+				SourceTable: "student_sign_in_fonzie_copy",
+			},
+		},
 	}
 	recorder := RecorderTest{}
 	ksink, err := NewKafkaSink(&conf, &recorder)

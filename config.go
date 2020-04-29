@@ -20,5 +20,11 @@ type KSinkConfig struct {
 	PartitionerType string
 
 	// 是否需要确认消息已经正常写入
-	RequiredAcks int
+	RequiredAcks  int
+	TableMapTopic []TableMapTopic
+}
+
+type TableMapTopic struct {
+	SourceTable string
+	Topic       string
 }
